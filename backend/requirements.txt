@@ -1,8 +1,6 @@
-fastapi
+﻿fastapi
 uvicorn[standard]
 httpx
 python-dotenv
-
-# Streamlit frontend
 streamlit
 requests
