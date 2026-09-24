@@ -1,3 +1,7 @@
+# Local-only docs (not for GitHub)
+OVERVIEW.md
+BUILD_DOCS.md
+
 # Python
 __pycache__/
 *.py[cod]

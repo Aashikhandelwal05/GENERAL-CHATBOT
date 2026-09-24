@@ -1,8 +1,3 @@
-"""
-Multi-Provider Chatbot Backend — FastAPI
-POST /chat  →  { "message": str, "provider": "openai" | "gemini" | "groq" }
-"""
-
 import os
 import httpx
 from fastapi import FastAPI, HTTPException
@@ -12,7 +7,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 GROQ_API_KEY   = os.getenv("GROQ_API_KEY")
 
@@ -27,7 +21,7 @@ app.add_middleware(
 )
 
 
-# ── Schemas ───────────────────────────────────────────────────────────────────
+# ── Schemas 
 class ChatRequest(BaseModel):
     message: str
     provider: str = "gemini"   # "openai" | "gemini" | "groq"
@@ -37,43 +31,14 @@ class ChatResponse(BaseModel):
     provider: str
 
 
-# ── Provider helpers ──────────────────────────────────────────────────────────
-
-async def call_openai(message: str) -> str:
-    if not OPENAI_API_KEY:
-        raise HTTPException(status_code=500, detail="OPENAI_API_KEY is not set.")
-
-    url = "https://api.openai.com/v1/chat/completions"
-    headers = {
-        "Authorization": f"Bearer {OPENAI_API_KEY}",
-        "Content-Type": "application/json",
-    }
-    payload = {
-        "model": "gpt-4o-mini",
-        "messages": [{"role": "user", "content": message}],
-        "temperature": 0.7,
-    }
-
-    async with httpx.AsyncClient(timeout=30) as client:
-        response = await client.post(url, headers=headers, json=payload)
-
-    if response.status_code != 200:
-        raise HTTPException(
-            status_code=response.status_code,
-            detail=f"OpenAI error: {response.text}",
-        )
-
-    try:
-        return response.json()["choices"][0]["message"]["content"]
-    except (KeyError, IndexError) as e:
-        raise HTTPException(status_code=502, detail=f"Unexpected OpenAI response: {e}")
+# ── Provider helpers 
 
 
 async def call_gemini(message: str) -> str:
     if not GEMINI_API_KEY:
         raise HTTPException(status_code=500, detail="GEMINI_API_KEY is not set.")
 
-    # NOTE: gemini-1.5-flash is deprecated on v1beta; using gemini-2.5-flash instead
+
     url = (
         "https://generativelanguage.googleapis.com/v1beta/models/"
         f"gemini-2.5-flash:generateContent?key={GEMINI_API_KEY}"
@@ -127,10 +92,9 @@ async def call_groq(message: str) -> str:
         raise HTTPException(status_code=502, detail=f"Unexpected Groq response: {e}")
 
 
-# ── Main endpoint ─────────────────────────────────────────────────────────────
+# ── Main endpoint 
 
 PROVIDERS = {
-    "openai": call_openai,
     "gemini": call_gemini,
     "groq":   call_groq,
 }

@@ -9,7 +9,7 @@ general chatbot/
 ├── backend/
 │   ├── main.py            # FastAPI backend — /chat endpoint
 │   ├── requirements.txt   # Python dependencies
-│   └── .env               # API keys (never commit this)
+│   └── .env               # API keys
 └── streamlit_app.py       # Streamlit frontend
 ```
 
