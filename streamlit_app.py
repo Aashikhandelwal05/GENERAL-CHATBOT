@@ -1,31 +1,30 @@
-﻿import streamlit as st
+import streamlit as st
 import requests
 
 # ── Page config ───────────────────────────────────────────────────────────────
-st.set_page_config(page_title="AI Chatbot", page_icon="🤖", layout="centered")
+st.set_page_config(page_title="AI Chatbot", layout="centered")
 
 # ── Backend URL ───────────────────────────────────────────────────────────────
 API_URL = "http://localhost:8000/chat"
 
 # ── Sidebar ───────────────────────────────────────────────────────────────────
 with st.sidebar:
-    st.title("⚙️ Settings")
+    st.title("Settings")
     provider = st.selectbox(
         "AI Provider",
-        options=["gemini", "openai", "groq"],
+        options=["gemini", "groq"],
         format_func=lambda x: {
-            "gemini": "✨ Google Gemini (gemini-2.5-flash)",
-            "openai": "🧠 OpenAI (gpt-4o-mini)",
-            "groq":   "⚡ Groq (gpt-oss-120b)",
+            "gemini": "Google Gemini (gemini-2.5-flash)",
+            "groq":   "Groq (gpt-oss-120b)",
         }[x],
     )
-    if st.button("🗑️ Clear Chat", use_container_width=True):
+    if st.button("Clear Chat", use_container_width=True):
         st.session_state.messages = []
         st.rerun()
 
 # ── Title ─────────────────────────────────────────────────────────────────────
-st.title("🤖 AI Chatbot")
-st.caption("Powered by Google Gemini, OpenAI & Groq")
+st.title("AI Chatbot")
+st.caption("Powered by Google Gemini & Groq")
 st.divider()
 
 # ── Session state ─────────────────────────────────────────────────────────────
@@ -37,12 +36,12 @@ for msg in st.session_state.messages:
     with st.chat_message(msg["role"]):
         st.markdown(msg["content"])
         if msg["role"] == "assistant" and msg.get("provider"):
-            labels = {"gemini": "✨ Gemini", "openai": "🧠 OpenAI", "groq": "⚡ Groq"}
+            labels = {"gemini": "Gemini", "groq": "Groq"}
             st.caption(f"Answered by **{labels.get(msg['provider'], msg['provider'])}**")
 
 # ── Empty state ───────────────────────────────────────────────────────────────
 if not st.session_state.messages:
-    st.info("👈 Pick a provider in the sidebar, then start chatting below!")
+    st.info("Pick a provider in the sidebar, then start chatting below!")
 
 # ── Chat input ────────────────────────────────────────────────────────────────
 if prompt := st.chat_input("Ask anything…"):
@@ -67,21 +66,21 @@ if prompt := st.chat_input("Ask anything…"):
                 answered_by = data.get("provider", provider)
 
             except requests.exceptions.ConnectionError:
-                reply = "⚠️ Cannot connect to the backend. Make sure uvicorn is running on port 8000."
+                reply = "Cannot connect to the backend. Make sure uvicorn is running on port 8000."
                 answered_by = None
 
             except requests.exceptions.Timeout:
-                reply = "⚠️ Request timed out. The AI provider may be slow — try again."
+                reply = "Request timed out. The AI provider may be slow — try again."
                 answered_by = None
 
             except requests.exceptions.HTTPError as e:
                 detail = response.json().get("detail", str(e))
-                reply = f"⚠️ Backend error: {detail}"
+                reply = f"Backend error: {detail}"
                 answered_by = None
 
         st.markdown(reply)
         if answered_by:
-            labels = {"gemini": "✨ Gemini", "openai": "🧠 OpenAI", "groq": "⚡ Groq"}
+            labels = {"gemini": "Gemini", "groq": "Groq"}
             st.caption(f"Answered by **{labels.get(answered_by, answered_by)}**")
 
     st.session_state.messages.append({

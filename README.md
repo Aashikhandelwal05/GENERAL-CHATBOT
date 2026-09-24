@@ -1,37 +1,60 @@
-# AI Chatbot — Gemini & Groq
+# AI General Chatbot — Gemini & Groq
 
-A minimal, clean chatbot that routes messages to either **Google Gemini** or **Groq** based on user selection.
+A simple chatbot that routes messages to either **Google Gemini** or **Groq** based on user selection.
+
+## Project Structure
 
 ```
 general chatbot/
 ├── backend/
-│   ├── main.py            # FastAPI app — all server logic
+│   ├── main.py            # FastAPI backend — /chat endpoint
 │   ├── requirements.txt   # Python dependencies
-│   └── .env.example       # Template for API keys
-└── frontend/
-    └── index.html         # Single-file chat UI (HTML + CSS + JS)
+│   └── .env               # API keys (never commit this)
+└── streamlit_app.py       # Streamlit frontend
 ```
 
-## Quickstart
+## Setup
 
-### 1. Backend
+### 1. Add your API keys
+
+Edit `backend/.env`:
+
+```
+GEMINI_API_KEY=your-gemini-key-here
+GROQ_API_KEY=your-groq-key-here
+```
+
+### 2. Install dependencies
+
 ```bash
 cd backend
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Set up your API keys
-cp .env.example .env
-# Edit .env and add your real keys
-
-# Start the server
-uvicorn main:app --reload
-# → http://localhost:8000
+python -m pip install -r requirements.txt
 ```
 
-### 2. Frontend
-Just open `frontend/index.html` in your browser — no build step needed.
+## Running the App
+
+You need **two terminals** running at the same time.
+
+**Terminal 1 — Start the backend:**
+```bash
+cd backend
+python -m uvicorn main:app --reload
+```
+Backend runs at: http://localhost:8000
+
+**Terminal 2 — Start the frontend:**
+```bash
+cd "general chatbot"
+python -m streamlit run streamlit_app.py
+```
+Frontend runs at: http://localhost:8501
+
+## Providers
+
+| Provider | Model |
+|---|---|
+| Google Gemini | gemini-2.5-flash |
+| Groq | openai/gpt-oss-120b |
 
 ## API
 
@@ -39,12 +62,9 @@ Just open `frontend/index.html` in your browser — no build step needed.
 ```json
 { "message": "Hello!", "provider": "gemini" }
 ```
+Response:
 ```json
 { "reply": "Hi there!", "provider": "gemini" }
 ```
 
-## Environment Variables
-| Variable | Description |
-|---|---|
-| `GEMINI_API_KEY` | Google AI Studio key |
-| `GROQ_API_KEY` | Groq Console key |
+`GET /health` — returns `{ "status": "ok" }`
